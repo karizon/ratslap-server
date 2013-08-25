@@ -22,7 +22,7 @@ var startDate = new Date();
 var heloString = {
 	type: 'HELO',
 	status: 'CONNECTED',
-	message: 'RS Server v' + ttlVersion,
+	message: 'RS Server v' + rsVersion,
 	protocol: rsVersion,
 	started: startDate.today() + "T" + startDate.timeNow()
 };
@@ -70,49 +70,13 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
-function validate_user_login(user,newJSON) {
-	user.username = newJSON.username;
-	// console.log('Validating login for ' + user.username);
-	db = mysql.createConnection(config.dbInfo);
-	loginQuery = db.query('select password from users where email=?',[user.username],
-		function (error,rows,fields) {
-			if(error) {
-				console.log('DB Error: ' + error);
-			} else {
-				if(rows[0]) {
-					if(bcrypt.compareSync(newJSON.password,rows[0].password)) {
-						user.authenticated = 1;
-						console.log('Auth: Login Successful for ' + user.username);
-						var success_json = {
-							type: 'LOGIN',
-							status: 'SUCCESS',
-							message: 'Authentication Successful'
-						}
-						user.remoteClient.write(JSON.stringify(success_json) + '\n');
-					} else {
-						user.authenticated = 0;
-						console.log('Auth: login failed for ' + user.username);
-						return_error_code(user,'LOGIN','Authentication Failure');
-					}
-				} else {
-					user.authenticated = 0;
-					console.log('Auth: login failed for ' + user.username);
-					return_error_code(user,'LOGIN','Authentication Failure');
-				}
-				db.end(function(err) {
-					// console.log('connection terminated');
-				})
-			}
-		});
-}
-
 var server = tls.createServer(options,function(client) {
 	var user = {
 		remoteAddress: client.socket.remoteAddress,
 		remotePort: client.socket.remotePort,
-		username: '',
+		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
 		remoteClient: client,
-		authenticated: 0
+		authenticated: 1
 	}
 
 	console.log('Network: Adding new client from ' + user.remoteAddress);
@@ -129,14 +93,9 @@ var server = tls.createServer(options,function(client) {
 
 			if(user.authenticated) {
 				if(newJSON.type = 'GAME') {
-
+					console.log('Command: ' + user.username + ' requesting new game');
 				}
 			} else {
-				if(newJSON.type = 'LOGIN') {
-					validate_user_login(user,newJSON);
-				} else {
-					return_error_code(user,'any','Authentication Required');
-				}
 			}
 			str = str.substr(0, result[1]) + str.substr(result[2]);
 		}
