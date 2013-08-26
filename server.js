@@ -28,6 +28,9 @@ var heloString = {
 };
 
 var clients = [];
+var games = [];
+var newTwoPlayer = [];
+var newFourPlayer = [];
 
 var options = {
 	key: fs.readFileSync('server_key.pem'),
@@ -38,13 +41,28 @@ String.prototype.chomp = function () {
 	return this.replace(/(\n|\r)+$/, '');
 }
 
-function return_error_code(user,type,error_string) {
-	var error_json = {
+function returnErrorCode(user,type,errorString) {
+	var errorJSON = {
 		type: type,
 		status: 'ERROR',
-		message: error_string
+		message: errorString
 	}
-	user.remoteClient.write(JSON.stringify(error_json) + '\n');
+	user.remoteClient.write(JSON.stringify(errorJSON) + '\n');
+}
+
+function returnStatistics() {
+    var results = {
+        type:'STATISTICS',
+        status: 'SUCCESS',
+        clients: clients.length,
+        games: games.length,
+        twowaiting: newTwoPlayer.length,
+        fourwaiting: newFourPlayer.length
+    };
+    console.log('System: returning statistics to all users');
+    clients.forEach(function(user) {
+    	user.remoteClient.write(JSON.stringify(results) + '\n');
+    });
 }
 
 function extractJSON(str) {
@@ -80,9 +98,9 @@ var server = tls.createServer(options,function(client) {
 	}
 
 	console.log('Network: Adding new client: ' + user.username);
-	clients.push(client);
+	clients.push(user);
 	client.write(JSON.stringify(heloString) + '\n');
-
+	returnStatistics();
 	client.on('data', function(data) {
 		var str = data.toString();
 		// console.log('Network: ' + user.remoteAddress + ' sent: ' +  data.toString());
@@ -92,8 +110,10 @@ var server = tls.createServer(options,function(client) {
 			var newJSON = result[0];
 
 			if(user.authenticated) {
-				if(newJSON.type = 'GAME') {
+				if(newJSON.type == 'GAME') {
 					console.log('Command: ' + user.username + ' requesting new game');
+				} else if(newJSON.type == 'STATISTICS') {
+					console.log('Command: ' + user.username + ' requesting current server statistics');
 				}
 			} else {
 			}
@@ -105,6 +125,7 @@ var server = tls.createServer(options,function(client) {
 	client.on('close',function() {
 		console.log('Network: closed connection from ' + user.remoteAddress);
 		clients.splice(clients.indexOf(client),1);
+		returnStatistics();
 	});
 });
 
