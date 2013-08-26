@@ -79,7 +79,7 @@ var server = tls.createServer(options,function(client) {
 		authenticated: 1
 	}
 
-	console.log('Network: Adding new client from ' + user.remoteAddress);
+	console.log('Network: Adding new client: ' + user.username);
 	clients.push(client);
 	client.write(JSON.stringify(heloString) + '\n');
 
