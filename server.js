@@ -59,7 +59,7 @@ function returnStatistics() {
         twowaiting: newTwoPlayer.length,
         fourwaiting: newFourPlayer.length
     };
-    console.log('System: returning statistics to all users');
+    console.log('System: returning statistics to all users - ' + JSON.stringify(results));
     clients.forEach(function(user) {
     	user.remoteClient.write(JSON.stringify(results) + '\n');
     });
@@ -109,13 +109,10 @@ var server = tls.createServer(options,function(client) {
 			console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(result[0]));
 			var newJSON = result[0];
 
-			if(user.authenticated) {
-				if(newJSON.type == 'GAME') {
-					console.log('Command: ' + user.username + ' requesting new game');
-				} else if(newJSON.type == 'STATISTICS') {
-					console.log('Command: ' + user.username + ' requesting current server statistics');
-				}
-			} else {
+			if(newJSON.type == 'GAME') {
+				console.log('Command: ' + user.username + ' requesting new game');
+			} else if(newJSON.type == 'STATISTICS') {
+				console.log('Command: ' + user.username + ' requesting current server statistics (ignored)');
 			}
 			str = str.substr(0, result[1]) + str.substr(result[2]);
 		}
@@ -123,8 +120,8 @@ var server = tls.createServer(options,function(client) {
 	});
 
 	client.on('close',function() {
-		console.log('Network: closed connection from ' + user.remoteAddress);
-		clients.splice(clients.indexOf(client),1);
+		console.log('Network: closed connection from ' + user.username);
+		clients.splice(clients.indexOf(user),1);
 		returnStatistics();
 	});
 });
