@@ -1,10 +1,8 @@
 var tls = require('tls');
 var fs = require('fs');
-var mysql = require ('mysql');
 var bcrypt = require('bcrypt');
-var config = require('./config.js');
 var rsVersion = '0.1';
-
+var serverPort = 31337;
 
 //For todays date;
 Date.prototype.today = function(){ 
@@ -89,27 +87,27 @@ function extractJSON(str) {
 }
 
 function processJoinCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' submits game change');
 }
 
 function processLeaveCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' left current game');
 }
 
 function processCardCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' played a card');
 }
 
 function processStackCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' slapped the stack');
 }
 
 function processLogoutCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' has logged out');
 }
 
 function processBootCommand(user,request) {
-
+	console.log('Command: ' + user.username + ' voted to boot a user');
 }
 
 var server = tls.createServer(options,function(client) {
@@ -134,7 +132,6 @@ var server = tls.createServer(options,function(client) {
 			var newJSON = result[0];
 
 			if(newJSON.type == 'JOIN') {
-				console.log('Command: ' + user.username + ' submits game change');
 				processJoinCommand(user,newJSON);
 			} else if(newJSON.type == 'PAUSE') {
 				processPauseCommand(user,newJSON);
@@ -163,6 +160,6 @@ var server = tls.createServer(options,function(client) {
 	});
 });
 
-server.listen(config.serverPort,function() {
+server.listen(serverPort,function() {
 	console.log('Server: RS v' + rsVersion + ' listening on port',server.address().port);
 });
