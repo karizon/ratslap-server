@@ -88,6 +88,30 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
+function processJoinCommand(user,request) {
+
+}
+
+function processLeaveCommand(user,request) {
+
+}
+
+function processCardCommand(user,request) {
+
+}
+
+function processStackCommand(user,request) {
+
+}
+
+function processLogoutCommand(user,request) {
+
+}
+
+function processBootCommand(user,request) {
+
+}
+
 var server = tls.createServer(options,function(client) {
 	var user = {
 		remoteAddress: client.socket.remoteAddress,
@@ -109,8 +133,21 @@ var server = tls.createServer(options,function(client) {
 			console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(result[0]));
 			var newJSON = result[0];
 
-			if(newJSON.type == 'GAME') {
-				console.log('Command: ' + user.username + ' requesting new game');
+			if(newJSON.type == 'JOIN') {
+				console.log('Command: ' + user.username + ' submits game change');
+				processJoinCommand(user,newJSON);
+			} else if(newJSON.type == 'PAUSE') {
+				processPauseCommand(user,newJSON);
+			} else if(newJSON.type == 'LEAVE') {
+				processLeaveCommand(user,newJSON);
+			} else if(newJSON.type == 'CARD') {
+				processCardCommand(user,newJSON);
+			} else if(newJSON.type == 'STACK') {
+				processStackCommand(user,newJSON);
+			} else if(newJSON.type == 'LOGOUT') {
+				processLogoutCommand(user,newJSON);
+			} else if(newJSON.type == 'BOOT') {
+				processBootCommand(user,newJSON);
 			} else if(newJSON.type == 'STATISTICS') {
 				console.log('Command: ' + user.username + ' requesting current server statistics (ignored)');
 			}
