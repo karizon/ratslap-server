@@ -87,7 +87,13 @@ function extractJSON(str) {
 }
 
 function processJoinCommand(user,request) {
-	console.log('Command: ' + user.username + ' submits game change');
+	if(request.players == 2) {
+		console.log('Command: ' + user.username + ' joining 2 player game');
+	} else if(request.players == 4){
+		console.log('Command: ' + user.username + ' joining 4 player game');
+	} else {
+		console.log('Command: ' + user.username + ' submitted bad join request');
+	}
 }
 
 function processLeaveCommand(user,request) {
@@ -115,8 +121,7 @@ var server = tls.createServer(options,function(client) {
 		remoteAddress: client.socket.remoteAddress,
 		remotePort: client.socket.remotePort,
 		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
-		remoteClient: client,
-		authenticated: 1
+		remoteClient: client
 	}
 
 	console.log('Network: Adding new client: ' + user.username);
