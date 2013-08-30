@@ -86,11 +86,25 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
+function addPlayer(user,game) {
+	console.log('Adding Player to game: ' + user.username);
+}
+
 function processJoinCommand(user,request) {
 	if(request.players == 2) {
 		console.log('Command: ' + user.username + ' joining 2 player game');
+		addPlayer(user,newTwoPlayer[0])
+		if(newTwoPlayer.length == 2) {
+			games.push(newTwoPlayer[0]);
+			newTwoPlayer.splice(0,1);
+		}
 	} else if(request.players == 4){
+		addPlayer(user,newFourPlayer[0])
 		console.log('Command: ' + user.username + ' joining 4 player game');
+		if(newTwoPlayer.length == 4) {
+			games.push(newFourPlayer[0]);
+			newFourPlayer.splice(0,1);
+		}
 	} else {
 		console.log('Command: ' + user.username + ' submitted bad join request');
 	}
