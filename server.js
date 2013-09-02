@@ -133,7 +133,8 @@ function processBootCommand(user,request) {
 }
 function assignNickname(user,request) {
 	console.log('Command: ' + user.username + ' assigning new nickname: ' + request.nickname);
-	user.username = request.nickname + '(' + user.username + ')';
+	user.username = request.nickname + ' (' + user.username + ')';
+	user.nickname = request.nickname;
 }
 
 var server = tls.createServer(options,function(client) {
@@ -141,7 +142,8 @@ var server = tls.createServer(options,function(client) {
 		remoteAddress: client.socket.remoteAddress,
 		remotePort: client.socket.remotePort,
 		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
-		remoteClient: client
+		remoteClient: client,
+		nickname: null
 	}
 
 	console.log('Network: Adding new client: ' + user.username);
