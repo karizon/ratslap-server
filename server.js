@@ -57,10 +57,12 @@ function returnStatistics() {
         twowaiting: newTwoPlayer.length,
         fourwaiting: newFourPlayer.length
     };
-    console.log('System: returning statistics to all users - ' + JSON.stringify(results));
-    clients.forEach(function(user) {
-    	user.remoteClient.write(JSON.stringify(results) + '\n');
-    });
+    if(clients.length > 0) {
+	    console.log('System: returning statistics to all users - ' + JSON.stringify(results));
+	    clients.forEach(function(user) {
+	    	user.remoteClient.write(JSON.stringify(results) + '\n');
+	    });
+	}
 }
 
 function extractJSON(str) {
@@ -129,6 +131,10 @@ function processLogoutCommand(user,request) {
 function processBootCommand(user,request) {
 	console.log('Command: ' + user.username + ' voted to boot a user');
 }
+function assignNickname(user,request) {
+	console.log('Command: ' + user.username + ' assigning new nickname: ' + request.nickname);
+	user.username = request.nickname + '(' + user.username + ')';
+}
 
 var server = tls.createServer(options,function(client) {
 	var user = {
@@ -166,6 +172,8 @@ var server = tls.createServer(options,function(client) {
 				processBootCommand(user,newJSON);
 			} else if(newJSON.type == 'STATISTICS') {
 				console.log('Command: ' + user.username + ' requesting current server statistics (ignored)');
+			} else if(newJSON.type == 'NICKNAME') {
+				assignNickname(user,newJSON);
 			}
 			str = str.substr(0, result[1]) + str.substr(result[2]);
 		}
