@@ -143,7 +143,7 @@ var server = tls.createServer(options,function(client) {
 		remotePort: client.socket.remotePort,
 		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
 		remoteClient: client,
-		nickname: null
+		nickname: 'Unnamed Player'
 	}
 
 	console.log('Network: Adding new client: ' + user.username);
