@@ -200,9 +200,9 @@ function gameStatusUpdate(game) {
 	var results = {
         type:'GAME',
         status: 'UPDATE',
-        id: game.gameID,
-        playercount: game.players.length,
-        size: game.size
+        gameID: game.gameID,
+        playerCount: game.players.length,
+        gameSize: game.gameSize
     };
     console.log('Game ' + game.gameID + ': broadcasting game state');
     game.players.forEach(function(user) {
