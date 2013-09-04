@@ -192,8 +192,6 @@ var server = tls.createServer(options,function(client) {
 				processLogoutCommand(user,newJSON);
 			} else if(newJSON.type == 'BOOT') {
 				processBootCommand(user,newJSON);
-			} else if(newJSON.type == 'STATISTICS') {
-				console.log('Command: ' + user.username + ' requesting current server statistics (ignored)');
 			} else if(newJSON.type == 'NICKNAME') {
 				assignNickname(user,newJSON);
 			}
