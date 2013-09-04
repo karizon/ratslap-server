@@ -4,6 +4,8 @@ var bcrypt = require('bcrypt');
 var rsVersion = '0.1';
 var serverPort = 31337;
 
+var gameID = 1;
+
 //For todays date;
 Date.prototype.today = function(){ 
 	return this.getFullYear() +"/"+ (((this.getMonth()+1) < 10)?"0":"") 
@@ -88,29 +90,42 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
-function addPlayer(user,game,size) {
-	console.log('Game: Adding Player to game: ' + user.username);
+function addPlayer(user,game,gameSize) {
+	console.log('Game ' + gameID + ': Adding Player to game: ' + user.username);
 	if(!game) {
 		console.log('Game: Game does not exist yet');
 		var players = [];
 		var gameStart = new Date();
-		players.push(user);
 		var newGame = {
 			players: players,
+			gameSize: gameSize,
 			started: gameStart.today() + "T" + gameStart.timeNow(),
 			whoseMove: 0,
 			roundsPlayed: 0
 		}
-		if(size == 2) {
+		if(gameSize == 2) {
 			newTwoPlayer.push(newGame);
-		} else if(size == 4) {
+		} else if(gameSize == 4) {
 			newFourPlayer.push(newGame);
 		}
-
+		game = newGame;
 	} else {
-		console.log('Game: Game already exists');
+		console.log('Game ' + gameID + ': Game already exists');
 	}
-}
+	game.players.push(user);
+	if(game.players.length == gameSize) {
+		games.push(game);
+		console.log('Game ' + gameID + ': Game is full, starting');
+		if(gameSize == 2) {
+			newTwoPlayer.splice(newTwoPlayer.indexOf(game),1);
+		} else if(gameSize == 2) {
+			newFourPlayer.splice(newFourPlayer.indexOf(game),1);
+		}
+		gameID = gameID + 1;
+	}
+	gameStatusUpdate(game);
+	returnStatistics();
+}	
 
 function processJoinCommand(user,request) {
 	if(request.players == 2) {
@@ -151,10 +166,23 @@ function processLogoutCommand(user,request) {
 function processBootCommand(user,request) {
 	console.log('Command: ' + user.username + ' voted to boot a user');
 }
+
 function assignNickname(user,request) {
 	console.log('Command: ' + user.username + ' assigning new nickname: ' + request.nickname);
 	user.username = request.nickname + ' (' + user.username + ')';
 	user.nickname = request.nickname;
+}
+
+function gameStatusUpdate(game) {
+	var results = {
+        type:'GAME',
+        status: 'UPDATE',
+        players: game.players.length,
+        size: game.size
+    };
+    game.players.forEach(function(user) {
+    	user.remoteClient.write(JSON.stringify(results) + '\n');
+    });
 }
 
 var server = tls.createServer(options,function(client) {
@@ -163,7 +191,9 @@ var server = tls.createServer(options,function(client) {
 		remotePort: client.socket.remotePort,
 		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
 		remoteClient: client,
-		nickname: 'Unnamed Player'
+		nickname: 'Unnamed Player',
+		gameID: 0,
+		game: null
 	}
 
 	console.log('Network: Adding new client: ' + user.username);
@@ -197,7 +227,6 @@ var server = tls.createServer(options,function(client) {
 			}
 			str = str.substr(0, result[1]) + str.substr(result[2]);
 		}
-
 	});
 
 	client.on('close',function() {
