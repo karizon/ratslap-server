@@ -101,7 +101,8 @@ function addPlayer(user,game,gameSize) {
 			gameSize: gameSize,
 			started: gameStart.today() + "T" + gameStart.timeNow(),
 			whoseMove: 0,
-			roundsPlayed: 0
+			roundsPlayed: 0,
+			gameID: 0
 		}
 		if(gameSize == 2) {
 			newTwoPlayer.push(newGame);
@@ -113,8 +114,11 @@ function addPlayer(user,game,gameSize) {
 		console.log('Game ' + gameID + ': Game already exists');
 	}
 	game.players.push(user);
+	user.game = game;
+	user.gameID = gameID;
 	if(game.players.length == gameSize) {
 		games.push(game);
+		game.gameID = gameID;
 		console.log('Game ' + gameID + ': Game is full, starting');
 		if(gameSize == 2) {
 			newTwoPlayer.splice(newTwoPlayer.indexOf(game),1);
@@ -131,24 +135,28 @@ function processJoinCommand(user,request) {
 	if(request.players == 2) {
 		console.log('Command: ' + user.username + ' joining 2 player game');
 		addPlayer(user,newTwoPlayer[0],2)
-		if(newTwoPlayer.length == 2) {
-			games.push(newTwoPlayer[0]);
-			newTwoPlayer.splice(0,1);
-		}
 	} else if(request.players == 4){
-		addPlayer(user,newFourPlayer[0],4)
 		console.log('Command: ' + user.username + ' joining 4 player game');
-		if(newTwoPlayer.length == 4) {
-			games.push(newFourPlayer[0]);
-			newFourPlayer.splice(0,1);
-		}
+		addPlayer(user,newFourPlayer[0],4)
 	} else {
 		console.log('Command: ' + user.username + ' submitted bad join request');
 	}
 }
 
 function processLeaveCommand(user,request) {
-	console.log('Command: ' + user.username + ' left current game');
+	console.log('Command: ' + user.username + ' left current game - ' + user.game.gameID);
+	if(user.game) {
+		console.log('Game ' + user.game.gameID + ': Player ' + user.username + ' has left the game');
+		user.game.players.splice(user.game.players.indexOf(user),1);
+		if(user.game.players.length == 1) {
+			gameOverUpdate(user.game.players[0],1);
+			games.splice(games.indexOf(user.game),1);
+		} else {
+			gameStatusUpdate(user.game);
+		}
+		user.game = null;
+		user.gameID = 0;
+	}
 }
 
 function processCardCommand(user,request) {
@@ -173,13 +181,30 @@ function assignNickname(user,request) {
 	user.nickname = request.nickname;
 }
 
+function gameOverUpdate(user,win) {
+	console.log ('Game' + user.game.gameID + ' has ended, sending update to ' + user.username);
+	var results = {
+        type:'GAME',
+        status: 'ENDED',
+        id: user.game.gameID,
+        playercount: user.game.players.length,
+        size: user.game.size,
+        winner: win
+    };
+   	user.game = null;
+	user.gameID = 0;
+	user.remoteClient.write(JSON.stringify(results) + '\n');
+}
+
 function gameStatusUpdate(game) {
 	var results = {
         type:'GAME',
         status: 'UPDATE',
-        players: game.players.length,
+        id: game.gameID,
+        playercount: game.players.length,
         size: game.size
     };
+    console.log('Game ' + game.gameID + ': broadcasting game state');
     game.players.forEach(function(user) {
     	user.remoteClient.write(JSON.stringify(results) + '\n');
     });
@@ -232,6 +257,9 @@ var server = tls.createServer(options,function(client) {
 	client.on('close',function() {
 		console.log('Network: closed connection from ' + user.username);
 		clients.splice(clients.indexOf(user),1);
+		if(user.game) {
+			processLeaveCommand(user);
+		}
 		returnStatistics();
 	});
 });
