@@ -88,20 +88,40 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
-function addPlayer(user,game) {
-	console.log('Adding Player to game: ' + user.username);
+function addPlayer(user,game,size) {
+	console.log('Game: Adding Player to game: ' + user.username);
+	if(!game) {
+		console.log('Game: Game does not exist yet');
+		var players = [];
+		var gameStart = new Date();
+		players.push(user);
+		var newGame = {
+			players: players,
+			started: gameStart.today() + "T" + gameStart.timeNow(),
+			whoseMove: 0,
+			roundsPlayed: 0
+		}
+		if(size == 2) {
+			newTwoPlayer.push(newGame);
+		} else if(size == 4) {
+			newFourPlayer.push(newGame);
+		}
+
+	} else {
+		console.log('Game: Game already exists');
+	}
 }
 
 function processJoinCommand(user,request) {
 	if(request.players == 2) {
 		console.log('Command: ' + user.username + ' joining 2 player game');
-		addPlayer(user,newTwoPlayer[0])
+		addPlayer(user,newTwoPlayer[0],2)
 		if(newTwoPlayer.length == 2) {
 			games.push(newTwoPlayer[0]);
 			newTwoPlayer.splice(0,1);
 		}
 	} else if(request.players == 4){
-		addPlayer(user,newFourPlayer[0])
+		addPlayer(user,newFourPlayer[0],4)
 		console.log('Command: ' + user.username + ' joining 4 player game');
 		if(newTwoPlayer.length == 4) {
 			games.push(newFourPlayer[0]);
