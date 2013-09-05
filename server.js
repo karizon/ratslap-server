@@ -122,7 +122,7 @@ function addPlayer(user,game,gameSize) {
 		console.log('Game ' + gameID + ': Game is full, starting');
 		if(gameSize == 2) {
 			newTwoPlayer.splice(newTwoPlayer.indexOf(game),1);
-		} else if(gameSize == 2) {
+		} else if(gameSize == 4) {
 			newFourPlayer.splice(newFourPlayer.indexOf(game),1);
 		}
 		gameID = gameID + 1;
@@ -149,8 +149,23 @@ function processLeaveCommand(user,request) {
 		console.log('Game ' + user.game.gameID + ': Player ' + user.username + ' has left the game');
 		user.game.players.splice(user.game.players.indexOf(user),1);
 		if(user.game.players.length == 1) {
-			gameOverUpdate(user.game.players[0],1);
-			games.splice(games.indexOf(user.game),1);
+			if(user.game.gameID != 0) {
+				gameOverUpdate(user.game.players[0],1);
+				games.splice(games.indexOf(user.game),1);
+			}  else {
+				gameStatusUpdate(user.game);
+			}
+		} else if(user.game.players.length == 0) {
+			console.log('Game ' + user.game.gameID + ': No players waiting to play, abandoning');
+			if(user.game.gameID == 0) {
+				if(user.game.gameSize == 2) {
+					newTwoPlayer.splice(newTwoPlayer.indexOf(user.game),1);
+				} else if(user.game.gameSize == 4) {
+					newFourPlayer.splice(newFourPlayer.indexOf(user.game),1);
+				}
+			} else {
+				games.splice(games.indexOf(user.game),1);
+			}
 		} else {
 			gameStatusUpdate(user.game);
 		}
