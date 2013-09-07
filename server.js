@@ -233,9 +233,9 @@ var server = tls.createServer(options,function(client) {
 		remoteClient: client,
 		nickname: 'Unnamed Player',
 		game: null,
-		playerID = playerID
+		playerID: playerID
 	}
-	
+
 	playerID = playerID + 1;
 
 	console.log('Network: Adding new client: ' + user.username);
