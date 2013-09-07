@@ -146,32 +146,36 @@ function processJoinCommand(user,request) {
 }
 
 function processLeaveCommand(user,request) {
-	console.log('Command: ' + user.username + ' left current game - ' + user.game.gameID);
 	if(user.game) {
-		console.log('Game ' + user.game.gameID + ': Player ' + user.username + ' has left the game');
-		user.game.players.splice(user.game.players.indexOf(user),1);
-		if(user.game.players.length == 1) {
-			if(user.game.gameID != 0) {
-				gameOverUpdate(user.game.players[0],1);
-				games.splice(games.indexOf(user.game),1);
-			}  else {
-				gameStatusUpdate(user.game,'PLAYERPART');
-			}
-		} else if(user.game.players.length == 0) {
-			console.log('Game ' + user.game.gameID + ': No players waiting to play, abandoning');
-			if(user.game.gameID == 0) {
-				if(user.game.gameSize == 2) {
-					newTwoPlayer.splice(newTwoPlayer.indexOf(user.game),1);
-				} else if(user.game.gameSize == 4) {
-					newFourPlayer.splice(newFourPlayer.indexOf(user.game),1);
+		console.log('Command: ' + user.username + ' left current game - ' + user.game.gameID);
+		if(user.game) {
+			console.log('Game ' + user.game.gameID + ': Player ' + user.username + ' has left the game');
+			user.game.players.splice(user.game.players.indexOf(user),1);
+			if(user.game.players.length == 1) {
+				if(user.game.gameID != 0) {
+					gameOverUpdate(user.game.players[0],1);
+					games.splice(games.indexOf(user.game),1);
+				}  else {
+					gameStatusUpdate(user.game,'PLAYERPART');
+				}
+			} else if(user.game.players.length == 0) {
+				console.log('Game ' + user.game.gameID + ': No players waiting to play, abandoning');
+				if(user.game.gameID == 0) {
+					if(user.game.gameSize == 2) {
+						newTwoPlayer.splice(newTwoPlayer.indexOf(user.game),1);
+					} else if(user.game.gameSize == 4) {
+						newFourPlayer.splice(newFourPlayer.indexOf(user.game),1);
+					}
+				} else {
+					games.splice(games.indexOf(user.game),1);
 				}
 			} else {
-				games.splice(games.indexOf(user.game),1);
+				gameStatusUpdate(user.game,'PLAYERPART');
 			}
-		} else {
-			gameStatusUpdate(user.game,'PLAYERPART');
+			user.game = null;
 		}
-		user.game = null;
+	} else {
+		console.log('Command: ' + user.username + ' attempted to leave a game but is not in one');
 	}
 }
 
