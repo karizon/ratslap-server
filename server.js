@@ -5,6 +5,7 @@ var rsVersion = '0.1';
 var serverPort = 31337;
 
 var gameID = 1;
+var playerID = 1;
 
 //For todays date;
 Date.prototype.today = function(){ 
@@ -115,7 +116,6 @@ function addPlayer(user,game,gameSize) {
 	}
 	game.players.push(user);
 	user.game = game;
-	user.gameID = gameID;
 	if(game.players.length == gameSize) {
 		games.push(game);
 		game.gameID = gameID;
@@ -126,8 +126,10 @@ function addPlayer(user,game,gameSize) {
 			newFourPlayer.splice(newFourPlayer.indexOf(game),1);
 		}
 		gameID = gameID + 1;
+		gameStatusUpdate(game,'GAMESTART');
+	} else {
+		gameStatusUpdate(game,'NEWPLAYER');	
 	}
-	gameStatusUpdate(game);
 	returnStatistics();
 }	
 
@@ -153,7 +155,7 @@ function processLeaveCommand(user,request) {
 				gameOverUpdate(user.game.players[0],1);
 				games.splice(games.indexOf(user.game),1);
 			}  else {
-				gameStatusUpdate(user.game);
+				gameStatusUpdate(user.game,'PLAYERPART');
 			}
 		} else if(user.game.players.length == 0) {
 			console.log('Game ' + user.game.gameID + ': No players waiting to play, abandoning');
@@ -167,10 +169,9 @@ function processLeaveCommand(user,request) {
 				games.splice(games.indexOf(user.game),1);
 			}
 		} else {
-			gameStatusUpdate(user.game);
+			gameStatusUpdate(user.game,'PLAYERPART');
 		}
 		user.game = null;
-		user.gameID = 0;
 	}
 }
 
@@ -207,14 +208,13 @@ function gameOverUpdate(user,win) {
         winner: win
     };
    	user.game = null;
-	user.gameID = 0;
 	user.remoteClient.write(JSON.stringify(results) + '\n');
 }
 
-function gameStatusUpdate(game) {
+function gameStatusUpdate(game,status) {
 	var results = {
         type:'GAME',
-        status: 'UPDATE',
+        status: status,
         gameID: game.gameID,
         playerCount: game.players.length,
         gameSize: game.gameSize
@@ -232,9 +232,11 @@ var server = tls.createServer(options,function(client) {
 		username: client.socket.remoteAddress + ':' + client.socket.remotePort,
 		remoteClient: client,
 		nickname: 'Unnamed Player',
-		gameID: 0,
-		game: null
+		game: null,
+		playerID = playerID
 	}
+	
+	playerID = playerID + 1;
 
 	console.log('Network: Adding new client: ' + user.username);
 	clients.push(user);
