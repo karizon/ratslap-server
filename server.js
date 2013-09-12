@@ -221,10 +221,12 @@ function gameStatusUpdate(game,status) {
         status: status,
         gameID: game.gameID,
         playerCount: game.players.length,
-        gameSize: game.gameSize
+        gameSize: game.gameSize,
+        position: game.players.length
     };
     console.log('Game ' + game.gameID + ': broadcasting game state');
     game.players.forEach(function(user) {
+    	results.position = game.players.indexOf(user) + 1;
     	user.remoteClient.write(JSON.stringify(results) + '\n');
     });
 }
