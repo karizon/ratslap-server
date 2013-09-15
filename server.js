@@ -199,6 +199,9 @@ function assignNickname(user,request) {
 	console.log('Command: ' + user.username + ' assigning new nickname: ' + request.nickname);
 	user.username = request.nickname + ' (' + user.username + ')';
 	user.nickname = request.nickname;
+	if(user.game) {
+		gameStatusUpdate(user.game,'NICKNAMECHANGE');
+	}
 }
 
 function gameOverUpdate(user,win) {
@@ -217,8 +220,14 @@ function gameOverUpdate(user,win) {
 
 function gameStatusUpdate(game,status) {
 	var playerNames = [];
+	var i=1;
 	game.players.forEach(function(user) {
-		playerNames.push(user.nickname + ' (' + user.playerID + ')');
+		var newPlayer = {
+			position: i,
+			name: user.nickname
+		}
+		playerNames.push(newPlayer);
+		i++;
 	});
 	var results = {
         type:'GAME',
