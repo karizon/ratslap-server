@@ -216,13 +216,18 @@ function gameOverUpdate(user,win) {
 }
 
 function gameStatusUpdate(game,status) {
+	var playerNames = [];
+	game.players.forEach(function(user) {
+		playerNames.push(user.nickname + ' (' + user.playerID + ')');
+	});
 	var results = {
         type:'GAME',
         status: status,
         gameID: game.gameID,
         playerCount: game.players.length,
         gameSize: game.gameSize,
-        position: game.players.length
+        position: game.players.length,
+        playerNames: playerNames
     };
     console.log('Game ' + game.gameID + ': broadcasting game state');
     game.players.forEach(function(user) {
