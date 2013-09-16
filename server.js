@@ -158,6 +158,7 @@ function processLeaveCommand(user,request) {
 				}  else {
 					gameStatusUpdate(user.game,'PLAYERPART');
 				}
+				returnStatistics();
 			} else if(user.game.players.length == 0) {
 				console.log('Game ' + user.game.gameID + ': No players waiting to play, abandoning');
 				if(user.game.gameID == 0) {
@@ -169,6 +170,7 @@ function processLeaveCommand(user,request) {
 				} else {
 					games.splice(games.indexOf(user.game),1);
 				}
+				returnStatistics();
 			} else {
 				gameStatusUpdate(user.game,'PLAYERPART');
 			}
