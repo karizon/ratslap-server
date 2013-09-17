@@ -111,8 +111,6 @@ function addPlayer(user,game,gameSize) {
 			newFourPlayer.push(newGame);
 		}
 		game = newGame;
-	} else {
-		console.log('Game ' + gameID + ': Game already exists');
 	}
 	game.players.push(user);
 	user.game = game;
