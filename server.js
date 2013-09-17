@@ -61,7 +61,7 @@ function returnStatistics() {
         fourwaiting: newFourPlayer.length
     };
     if(clients.length > 0) {
-	    console.log('System: returning statistics to all users - ' + JSON.stringify(results));
+	    // console.log('System: returning statistics to all users - ' + JSON.stringify(results));
 	    clients.forEach(function(user) {
 	    	user.remoteClient.write(JSON.stringify(results) + '\n');
 	    });
