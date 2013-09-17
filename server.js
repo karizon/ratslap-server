@@ -269,7 +269,7 @@ var server = tls.createServer(options,function(client) {
 		// console.log('Network: ' + user.remoteAddress + ' sent: ' +  data.toString());
 		var result = '';
 		while((result = extractJSON(str))) {
-			console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(result[0]));
+			// console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(result[0]));
 			var newJSON = result[0];
 
 			if(newJSON.type == 'JOIN') {
