@@ -145,7 +145,7 @@ function processJoinCommand(user,request) {
 
 function processLeaveCommand(user,request) {
 	if(user.game) {
-		console.log('Command: ' + user.username + ' left current game - ' + user.game.gameID);
+		// console.log('Command: ' + user.username + ' left current game - ' + user.game.gameID);
 		if(user.game) {
 			console.log('Game ' + user.game.gameID + ': Player ' + user.username + ' has left the game');
 			user.game.players.splice(user.game.players.indexOf(user),1);
