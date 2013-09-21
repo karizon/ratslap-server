@@ -7,6 +7,64 @@ var serverPort = 31337;
 var gameID = 1;
 var playerID = 1;
 
+var standardDeck = [
+{suit: 'heart', face: 'A'},
+{suit: 'heart', face: '2'},
+{suit: 'heart', face: '3'},
+{suit: 'heart', face: '4'},
+{suit: 'heart', face: '5'},
+{suit: 'heart', face: '6'},
+{suit: 'heart', face: '7'},
+{suit: 'heart', face: '8'},
+{suit: 'heart', face: '9'},
+{suit: 'heart', face: '10'},
+{suit: 'heart', face: 'J'},
+{suit: 'heart', face: 'Q'},
+{suit: 'heart', face: 'K'},
+
+{suit: 'spade', face: 'A'},
+{suit: 'spade', face: '2'},
+{suit: 'spade', face: '3'},
+{suit: 'spade', face: '4'},
+{suit: 'spade', face: '5'},
+{suit: 'spade', face: '6'},
+{suit: 'spade', face: '7'},
+{suit: 'spade', face: '8'},
+{suit: 'spade', face: '9'},
+{suit: 'spade', face: '10'},
+{suit: 'spade', face: 'J'},
+{suit: 'spade', face: 'Q'},
+{suit: 'spade', face: 'K'},
+
+{suit: 'club', face: 'A'},
+{suit: 'club', face: '2'},
+{suit: 'club', face: '3'},
+{suit: 'club', face: '4'},
+{suit: 'club', face: '5'},
+{suit: 'club', face: '6'},
+{suit: 'club', face: '7'},
+{suit: 'club', face: '8'},
+{suit: 'club', face: '9'},
+{suit: 'club', face: '10'},
+{suit: 'club', face: 'J'},
+{suit: 'club', face: 'Q'},
+{suit: 'club', face: 'K'},
+
+{suit: 'diamond', face: 'A'},
+{suit: 'diamond', face: '2'},
+{suit: 'diamond', face: '3'},
+{suit: 'diamond', face: '4'},
+{suit: 'diamond', face: '5'},
+{suit: 'diamond', face: '6'},
+{suit: 'diamond', face: '7'},
+{suit: 'diamond', face: '8'},
+{suit: 'diamond', face: '9'},
+{suit: 'diamond', face: '10'},
+{suit: 'diamond', face: 'J'},
+{suit: 'diamond', face: 'Q'},
+{suit: 'diamond', face: 'K'},
+];
+
 //For todays date;
 Date.prototype.today = function(){ 
 	return this.getFullYear() +"/"+ (((this.getMonth()+1) < 10)?"0":"") 
@@ -91,6 +149,30 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
+function shuffle (array, random) {
+  var i = array.length, j, swap;
+  while (--i) {
+    j = Math.random() * (i + 1) | 0;
+    swap = array[i];
+    array[i] = array[j];
+    array[j] = swap;
+  }
+  return array;
+}
+
+function shuffleAndDeal(game) {
+	var newDeck = standardDeck.slice(0);
+	newDeck = shuffle(newDeck);
+	console.log('Shuffled Deck: ' + JSON.stringify(newDeck));
+}
+
+function startGame(game) {
+	// Shuffle the Deck.
+	shuffleAndDeal(game);
+	// Pick random player to start
+	// Announce deck sizes + current player
+}
+
 function addPlayer(user,game,gameSize) {
 	console.log('Game ' + gameID + ': Adding Player to game: ' + user.username);
 	if(!game) {
@@ -125,6 +207,7 @@ function addPlayer(user,game,gameSize) {
 		}
 		gameID = gameID + 1;
 		gameStatusUpdate(game,'GAMESTART');
+		startGame(game);
 	} else {
 		gameStatusUpdate(game,'NEWPLAYER');	
 	}
