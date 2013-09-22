@@ -169,10 +169,14 @@ function dealCardsToRemainingPlayers(game, cards) {
 	cards.forEach(function(card) {
 		game.players[currentPlayer].cards.push(card);
 		currentPlayer = currentPlayer + 1;
-		if(currentPlayer = game.players.length) {
+		if(currentPlayer == game.players.length) {
 			currentPlayer = 0;
 		}
 	});
+	game.players.forEach(function(player) {
+		console.log('Hand: ' + JSON.stringify(player.cards));
+	});
+
 }
 
 function startGame(game) {
