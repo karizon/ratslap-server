@@ -160,23 +160,37 @@ function shuffle (array, random) {
   return array;
 }
 
-function shuffleAndDeal(game) {
-	var newDeck = standardDeck.slice(0);
-	newDeck = shuffle(newDeck);
-	console.log('Shuffled Deck: ' + JSON.stringify(newDeck));
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function dealCardsToRemainingPlayers(game, cards) {
+	var currentPlayer = 0;
+	cards.forEach(function(card) {
+		game.players[currentPlayer].cards.push(card);
+		currentPlayer = currentPlayer + 1;
+		if(currentPlayer = game.players.length) {
+			currentPlayer = 0;
+		}
+	});
 }
 
 function startGame(game) {
 	// Shuffle the Deck.
-	shuffleAndDeal(game);
+	var newDeck = standardDeck.slice(0);
+	newDeck = shuffle(newDeck);
+	// Deal cards to all players
+	dealCardsToRemainingPlayers(game,newDeck);
 	// Pick random player to start
-	// Announce deck sizes + current player
+	game.whoseMove = getRandomInt(0,game.players.length);
+	// Announce deck sizes + current player (begin play!)
+
 }
 
 function addPlayer(user,game,gameSize) {
 	console.log('Game ' + gameID + ': Adding Player to game: ' + user.username);
 	if(!game) {
-		console.log('Game: Game does not exist yet');
+		console.log('Game ' + gameID + ': initialized');
 		var players = [];
 		var gameStart = new Date();
 		var newGame = {
@@ -199,7 +213,7 @@ function addPlayer(user,game,gameSize) {
 	if(game.players.length == gameSize) {
 		games.push(game);
 		game.gameID = gameID;
-		console.log('Game ' + gameID + ': Game is full, starting');
+		console.log('Game ' + gameID + ': Full, starting');
 		if(gameSize == 2) {
 			newTwoPlayer.splice(newTwoPlayer.indexOf(game),1);
 		} else if(gameSize == 4) {
@@ -256,9 +270,8 @@ function processLeaveCommand(user,request) {
 				gameStatusUpdate(user.game,'PLAYERPART');
 			}
 			user.game = null;
+			user.cards = null;
 		}
-	} else {
-		console.log('Command: ' + user.username + ' attempted to leave a game but is not in one');
 	}
 }
 
@@ -298,6 +311,7 @@ function gameOverUpdate(user,win) {
         winner: win
     };
    	user.game = null;
+   	user.cards = null;
 	user.remoteClient.write(JSON.stringify(results) + '\n');
 }
 
@@ -329,6 +343,7 @@ function gameStatusUpdate(game,status) {
 }
 
 var server = tls.createServer(options,function(client) {
+	var playerCards = [];
 	var user = {
 		remoteAddress: client.socket.remoteAddress,
 		remotePort: client.socket.remotePort,
@@ -336,7 +351,8 @@ var server = tls.createServer(options,function(client) {
 		remoteClient: client,
 		nickname: 'Unnamed Player',
 		game: null,
-		playerID: playerID
+		playerID: playerID,
+		cards: playerCards
 	}
 
 	playerID = playerID + 1;
