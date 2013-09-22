@@ -179,6 +179,28 @@ function dealCardsToRemainingPlayers(game, cards) {
 
 }
 
+function announceCurrentRound(game) {
+	var handSizes = [];
+	var position = 1;
+	game.players.forEach(function(player) {
+		var hand = {
+			position: position++,
+			size: player.cards.length
+		}
+		handSizes.push(hand);
+	});
+    var results = {
+        type:'ROUND',
+        status: 'UPDATE',
+        handSizes: handSizes,
+        currentPlayer: game.whoseMove
+	};
+    game.players.forEach(function(user) {
+    	user.remoteClient.write(JSON.stringify(results) + '\n');
+    });
+
+}
+
 function startGame(game) {
 	// Shuffle the Deck.
 	var newDeck = standardDeck.slice(0);
@@ -188,7 +210,7 @@ function startGame(game) {
 	// Pick random player to start
 	game.whoseMove = getRandomInt(0,game.players.length);
 	// Announce deck sizes + current player (begin play!)
-
+	announceCurrentRound(game);
 }
 
 function addPlayer(user,game,gameSize) {
@@ -274,7 +296,7 @@ function processLeaveCommand(user,request) {
 				gameStatusUpdate(user.game,'PLAYERPART');
 			}
 			user.game = null;
-			user.cards = null;
+			user.cards = [];
 		}
 	}
 }
@@ -315,7 +337,7 @@ function gameOverUpdate(user,win) {
         winner: win
     };
    	user.game = null;
-   	user.cards = null;
+   	user.cards = [];
 	user.remoteClient.write(JSON.stringify(results) + '\n');
 }
 
