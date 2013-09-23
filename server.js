@@ -173,10 +173,6 @@ function dealCardsToRemainingPlayers(game, cards) {
 			currentPlayer = 0;
 		}
 	});
-	game.players.forEach(function(player) {
-		console.log('Hand: ' + JSON.stringify(player.cards));
-	});
-
 }
 
 function announceCurrentRound(game) {
