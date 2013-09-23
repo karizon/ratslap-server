@@ -204,7 +204,7 @@ function startGame(game) {
 	// Deal cards to all players
 	dealCardsToRemainingPlayers(game,newDeck);
 	// Pick random player to start
-	game.whoseMove = getRandomInt(0,game.players.length);
+	game.whoseMove = getRandomInt(1,game.players.length);
 	// Announce deck sizes + current player (begin play!)
 	announceCurrentRound(game);
 }
