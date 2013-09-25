@@ -41,7 +41,7 @@ var standardDeck = [
 {type: 'CARD', suit: 'club', face: '3'},
 {type: 'CARD', suit: 'club', face: '4'},
 {type: 'CARD', suit: 'club', face: '5'},
-{type: 'CARD', uit: 'club', face: '6'},
+{type: 'CARD', suit: 'club', face: '6'},
 {type: 'CARD', suit: 'club', face: '7'},
 {type: 'CARD', suit: 'club', face: '8'},
 {type: 'CARD', suit: 'club', face: '9'},
