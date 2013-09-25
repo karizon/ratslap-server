@@ -304,8 +304,6 @@ function processCardCommand(user,request) {
 		if(request.status == 'stack') {
 			var userNum = user.game.players.indexOf(user);
 			userNum += 1;
-			console.log('Current move: ' + user.game.whoseMove + 
-				' attempted by ' + userNum);
 			if(user.game.whoseMove == userNum) {
 				var newCard = user.cards.shift();
 				console.log('Command: ' + user.username + ' played a card - ' +
