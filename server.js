@@ -8,61 +8,61 @@ var gameID = 1;
 var playerID = 1;
 
 var standardDeck = [
-{suit: 'heart', face: 'A'},
-{suit: 'heart', face: '2'},
-{suit: 'heart', face: '3'},
-{suit: 'heart', face: '4'},
-{suit: 'heart', face: '5'},
-{suit: 'heart', face: '6'},
-{suit: 'heart', face: '7'},
-{suit: 'heart', face: '8'},
-{suit: 'heart', face: '9'},
-{suit: 'heart', face: '10'},
-{suit: 'heart', face: 'J'},
-{suit: 'heart', face: 'Q'},
-{suit: 'heart', face: 'K'},
+{type: 'CARD', suit: 'heart', face: 'A'},
+{type: 'CARD', suit: 'heart', face: '2'},
+{type: 'CARD', suit: 'heart', face: '3'},
+{type: 'CARD', suit: 'heart', face: '4'},
+{type: 'CARD', suit: 'heart', face: '5'},
+{type: 'CARD', suit: 'heart', face: '6'},
+{type: 'CARD', suit: 'heart', face: '7'},
+{type: 'CARD', suit: 'heart', face: '8'},
+{type: 'CARD', suit: 'heart', face: '9'},
+{type: 'CARD', suit: 'heart', face: '10'},
+{type: 'CARD', suit: 'heart', face: 'J'},
+{type: 'CARD', suit: 'heart', face: 'Q'},
+{type: 'CARD', suit: 'heart', face: 'K'},
 
-{suit: 'spade', face: 'A'},
-{suit: 'spade', face: '2'},
-{suit: 'spade', face: '3'},
-{suit: 'spade', face: '4'},
-{suit: 'spade', face: '5'},
-{suit: 'spade', face: '6'},
-{suit: 'spade', face: '7'},
-{suit: 'spade', face: '8'},
-{suit: 'spade', face: '9'},
-{suit: 'spade', face: '10'},
-{suit: 'spade', face: 'J'},
-{suit: 'spade', face: 'Q'},
-{suit: 'spade', face: 'K'},
+{type: 'CARD', suit: 'spade', face: 'A'},
+{type: 'CARD', suit: 'spade', face: '2'},
+{type: 'CARD', suit: 'spade', face: '3'},
+{type: 'CARD', suit: 'spade', face: '4'},
+{type: 'CARD', suit: 'spade', face: '5'},
+{type: 'CARD', suit: 'spade', face: '6'},
+{type: 'CARD', suit: 'spade', face: '7'},
+{type: 'CARD', suit: 'spade', face: '8'},
+{type: 'CARD', suit: 'spade', face: '9'},
+{type: 'CARD', suit: 'spade', face: '10'},
+{type: 'CARD', suit: 'spade', face: 'J'},
+{type: 'CARD', suit: 'spade', face: 'Q'},
+{type: 'CARD', suit: 'spade', face: 'K'},
 
-{suit: 'club', face: 'A'},
-{suit: 'club', face: '2'},
-{suit: 'club', face: '3'},
-{suit: 'club', face: '4'},
-{suit: 'club', face: '5'},
-{suit: 'club', face: '6'},
-{suit: 'club', face: '7'},
-{suit: 'club', face: '8'},
-{suit: 'club', face: '9'},
-{suit: 'club', face: '10'},
-{suit: 'club', face: 'J'},
-{suit: 'club', face: 'Q'},
-{suit: 'club', face: 'K'},
+{type: 'CARD', suit: 'club', face: 'A'},
+{type: 'CARD', suit: 'club', face: '2'},
+{type: 'CARD', suit: 'club', face: '3'},
+{type: 'CARD', suit: 'club', face: '4'},
+{type: 'CARD', suit: 'club', face: '5'},
+{type: 'CARD', uit: 'club', face: '6'},
+{type: 'CARD', suit: 'club', face: '7'},
+{type: 'CARD', suit: 'club', face: '8'},
+{type: 'CARD', suit: 'club', face: '9'},
+{type: 'CARD', suit: 'club', face: '10'},
+{type: 'CARD', suit: 'club', face: 'J'},
+{type: 'CARD', suit: 'club', face: 'Q'},
+{type: 'CARD', suit: 'club', face: 'K'},
 
-{suit: 'diamond', face: 'A'},
-{suit: 'diamond', face: '2'},
-{suit: 'diamond', face: '3'},
-{suit: 'diamond', face: '4'},
-{suit: 'diamond', face: '5'},
-{suit: 'diamond', face: '6'},
-{suit: 'diamond', face: '7'},
-{suit: 'diamond', face: '8'},
-{suit: 'diamond', face: '9'},
-{suit: 'diamond', face: '10'},
-{suit: 'diamond', face: 'J'},
-{suit: 'diamond', face: 'Q'},
-{suit: 'diamond', face: 'K'},
+{type: 'CARD', suit: 'diamond', face: 'A'},
+{type: 'CARD', suit: 'diamond', face: '2'},
+{type: 'CARD', suit: 'diamond', face: '3'},
+{type: 'CARD', suit: 'diamond', face: '4'},
+{type: 'CARD', suit: 'diamond', face: '5'},
+{type: 'CARD', suit: 'diamond', face: '6'},
+{type: 'CARD', suit: 'diamond', face: '7'},
+{type: 'CARD', suit: 'diamond', face: '8'},
+{type: 'CARD', suit: 'diamond', face: '9'},
+{type: 'CARD', suit: 'diamond', face: '10'},
+{type: 'CARD', suit: 'diamond', face: 'J'},
+{type: 'CARD', suit: 'diamond', face: 'Q'},
+{type: 'CARD', suit: 'diamond', face: 'K'},
 ];
 
 //For todays date;
@@ -215,13 +215,15 @@ function addPlayer(user,game,gameSize) {
 		console.log('Game ' + gameID + ': initialized');
 		var players = [];
 		var gameStart = new Date();
+		var centerPile = [];
 		var newGame = {
 			players: players,
 			gameSize: gameSize,
 			started: gameStart.today() + "T" + gameStart.timeNow(),
 			whoseMove: 0,
 			roundsPlayed: 0,
-			gameID: 0
+			gameID: 0,
+			centerPile: centerPile
 		}
 		if(gameSize == 2) {
 			newTwoPlayer.push(newGame);
@@ -298,10 +300,26 @@ function processLeaveCommand(user,request) {
 }
 
 function processCardCommand(user,request) {
-	if(request.status == 'stack') {
-		console.log('Command: ' + user.username + ' played a card');
-	} else {
-		console.log('Command: ' + user.username + ' slapped the pile');
+	if(user.game) {
+		if(request.status == 'stack') {
+			var userNum = user.game.players.indexOf(user);
+			userNum += 1;
+			console.log('Current move: ' + user.game.whoseMove + 
+				' attempted by ' + userNum);
+			if(user.game.whoseMove == userNum) {
+				var newCard = user.cards.shift();
+				console.log('Command: ' + user.username + ' played a card - ' +
+					JSON.stringify(newCard));
+				user.game.centerPile.push(newCard);
+			    user.game.players.forEach(function(localUser) {
+			    	localUser.remoteClient.write(JSON.stringify(newCard) + '\n');
+			    });
+			} else {
+				console.log('Command: ' + user.username + ' attempted to play a card but not his turn!');
+			}
+		} else {
+			console.log('Command: ' + user.username + ' slapped the pile');
+		}
 	}
 }
 
