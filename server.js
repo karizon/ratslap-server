@@ -298,15 +298,11 @@ function processLeaveCommand(user,request) {
 }
 
 function processCardCommand(user,request) {
-	console.log('Command: ' + user.username + ' played a card');
-}
-
-function processStackCommand(user,request) {
-	console.log('Command: ' + user.username + ' slapped the stack');
-}
-
-function processLogoutCommand(user,request) {
-	console.log('Command: ' + user.username + ' has logged out');
+	if(request.status == 'stack') {
+		console.log('Command: ' + user.username + ' played a card');
+	} else {
+		console.log('Command: ' + user.username + ' slapped the pile');
+	}
 }
 
 function processBootCommand(user,request) {
@@ -393,16 +389,10 @@ var server = tls.createServer(options,function(client) {
 
 			if(newJSON.type == 'JOIN') {
 				processJoinCommand(user,newJSON);
-			} else if(newJSON.type == 'PAUSE') {
-				processPauseCommand(user,newJSON);
 			} else if(newJSON.type == 'LEAVE') {
 				processLeaveCommand(user,newJSON);
 			} else if(newJSON.type == 'CARD') {
 				processCardCommand(user,newJSON);
-			} else if(newJSON.type == 'STACK') {
-				processStackCommand(user,newJSON);
-			} else if(newJSON.type == 'LOGOUT') {
-				processLogoutCommand(user,newJSON);
 			} else if(newJSON.type == 'BOOT') {
 				processBootCommand(user,newJSON);
 			} else if(newJSON.type == 'NICKNAME') {
