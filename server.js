@@ -312,9 +312,15 @@ function checkChallengeStatus(game,card) {
 	} else if(card.face == 'J') {
 		return 1;
 	}
-
 	return 0;
+}
 
+function selectNextPlayer(game) {
+	game.whoseMove += 1;
+	if(game.whoseMove > game.players.length) {
+		game.whoseMove = 1;
+	}
+	announceCurrentRound(game);
 }
 
 function processCardCommand(user,request) {
@@ -337,6 +343,7 @@ function processCardCommand(user,request) {
 			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' + newChallengeRemaining + ' tries!');
 			    	user.game.challengeLeft = newChallengeRemaining;
 			    	user.game.challengeMax = newChallengeRemaining;
+			    	selectNextPlayer(user.game);
 			    } else if(user.game.challengeLeft > 0) {
 					user.game.challengeLeft -= 1;
 					if(user.game.challengeLeft == 0) {
@@ -345,10 +352,14 @@ function processCardCommand(user,request) {
 						// Reset Challenge and Advance turn.
 				    	console.log ('Game' + user.game.gameID + ': Challenge Failed!');
 						user.game.challengeMax = 0;
+						selectNextPlayer(user.game);
 					} else {
 						// Challenge continues next round.   Challenger may play another card
 					}
-				} 
+				} else {
+					// Normal card play.  Select next player!
+					selectNextPlayer(user.game);
+				}
 			} else {
 				console.log('Command: ' + user.username + ' attempted to play a card but not his turn!');
 			}
