@@ -223,6 +223,8 @@ function addPlayer(user,game,gameSize) {
 			whoseMove: 0,
 			roundsPlayed: 0,
 			gameID: 0,
+			challengeLeft: 0,
+			challengeMax: 0,
 			centerPile: centerPile
 		}
 		if(gameSize == 2) {
@@ -299,6 +301,22 @@ function processLeaveCommand(user,request) {
 	}
 }
 
+function checkChallengeStatus(game,card) {
+	// Determine if we need to start a new challenge - Ace, King, Queen, or Jack may start
+	if(card.face == 'A') {
+		return 4;
+	} else if(card.face == 'K') {
+		return 3;
+	} else if(card.face == 'Q') {
+		return 2;
+	} else if(card.face == 'J') {
+		return 1;
+	}
+
+	return 0;
+
+}
+
 function processCardCommand(user,request) {
 	if(user.game) {
 		if(request.status == 'stack') {
@@ -306,12 +324,31 @@ function processCardCommand(user,request) {
 			userNum += 1;
 			if(user.game.whoseMove == userNum) {
 				var newCard = user.cards.shift();
-				console.log('Command: ' + user.username + ' played a card - ' +
+				console.log('Command: ' + user.username + ' plays a card - ' +
 					JSON.stringify(newCard));
-				user.game.centerPile.push(newCard);
+
 			    user.game.players.forEach(function(localUser) {
 			    	localUser.remoteClient.write(JSON.stringify(newCard) + '\n');
 			    });
+
+			    var newChallengeRemaining = checkChallengeStatus(user.game,newCard);
+			    if(newChallengeRemaining) {
+			    	// We have a challenge!  Set the counter and push to the next player!
+			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' + newChallengeRemaining + ' tries!');
+			    	user.game.challengeLeft = newChallengeRemaining;
+			    	user.game.challengeMax = newChallengeRemaining;
+			    } else if(user.game.challengeLeft > 0) {
+					user.game.challengeLeft -= 1;
+					if(user.game.challengeLeft == 0) {
+						// User has failed challenge!  Challenger Wins!
+						// Assign Pile to Challenger
+						// Reset Challenge and Advance turn.
+				    	console.log ('Game' + user.game.gameID + ': Challenge Failed!');
+						user.game.challengeMax = 0;
+					} else {
+						// Challenge continues next round.   Challenger may play another card
+					}
+				} 
 			} else {
 				console.log('Command: ' + user.username + ' attempted to play a card but not his turn!');
 			}
