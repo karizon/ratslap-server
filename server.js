@@ -92,7 +92,7 @@ var startDate = new Date();
 var heloString = {
 	type: 'HELO',
 	status: 'CONNECTED',
-	message: 'RS Server v' + rsVersion,
+	message: 'RatSlap Server v' + rsVersion,
 	protocol: rsVersion,
 	started: startDate.today() + "T" + startDate.timeNow()
 };
@@ -200,6 +200,7 @@ function dealCardsToRemainingPlayers(game, cards) {
 function announceCurrentRound(game) {
 	var handSizes = [];
 	var position = 1;
+	// Place each player in order and announce how many cards they have in their hand
 	game.players.forEach(function(player) {
 		var hand = {
 			position: position++,
@@ -353,9 +354,11 @@ function assignPileToPlayer(user) {
 }
 
 function announceSlap(user,success) {
-
+	// user has slapped.
+	// success - 1 if succeed, 0 if not
 }
 
+// Advances the game to the next player in the list, then announces
 function selectNextPlayer(game) {
 	game.whoseMove += 1;
 	if(game.whoseMove > game.players.length) {
