@@ -1,3 +1,8 @@
+// Ratslap Server
+// Copyright 2013 Geoff 'Mandrake' Harrison <mandrake@mandrake.net>
+// http://mandrake.net
+// All Rights Reserved
+
 var tls = require('tls');
 var fs = require('fs');
 var bcrypt = require('bcrypt');
@@ -65,13 +70,13 @@ var standardDeck = [
 {type: 'CARD', suit: 'diamond', face: 'K'},
 ];
 
-//For todays date;
+// For todays date;
 Date.prototype.today = function(){ 
 	return this.getFullYear() +"/"+ (((this.getMonth()+1) < 10)?"0":"") 
 	+ (this.getMonth()+1) +"/"+  ((this.getDate() < 10)?"0":"") + this.getDate()
 };
 
-//For the time now
+// For the time now
 Date.prototype.timeNow = function(){
 	return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") 
 	+ this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
@@ -225,6 +230,7 @@ function addPlayer(user,game,gameSize) {
 			gameID: 0,
 			challengeLeft: 0,
 			challengeMax: 0,
+			challenger: -1,
 			centerPile: centerPile
 		}
 		if(gameSize == 2) {
@@ -301,8 +307,14 @@ function processLeaveCommand(user,request) {
 	}
 }
 
+function checkSlapAcceptable(game) {
+	// Determine if the current game will accept a slap at this time.
+
+}
+
 function checkChallengeStatus(game,card) {
 	// Determine if we need to start a new challenge - Ace, King, Queen, or Jack may start
+	// return the number of cards that the challenger is allowed to play for this challenge
 	if(card.face == 'A') {
 		return 4;
 	} else if(card.face == 'K') {
@@ -313,6 +325,14 @@ function checkChallengeStatus(game,card) {
 		return 1;
 	}
 	return 0;
+}
+
+function assignPileToPlayer(user) {
+	// The current game's pile has been assigned to this user
+}
+
+function announceSlap(user,success) {
+
 }
 
 function selectNextPlayer(game) {
@@ -340,17 +360,20 @@ function processCardCommand(user,request) {
 			    var newChallengeRemaining = checkChallengeStatus(user.game,newCard);
 			    if(newChallengeRemaining) {
 			    	// We have a challenge!  Set the counter and push to the next player!
-			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' + newChallengeRemaining + ' tries!');
+			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' 
+			    		+ newChallengeRemaining + ' tries!');
 			    	user.game.challengeLeft = newChallengeRemaining;
 			    	user.game.challengeMax = newChallengeRemaining;
+			    	user.game.challenger = userNum;
 			    	selectNextPlayer(user.game);
 			    } else if(user.game.challengeLeft > 0) {
 					user.game.challengeLeft -= 1;
 					if(user.game.challengeLeft == 0) {
 						// User has failed challenge!  Challenger Wins!
-						// Assign Pile to Challenger
-						// Reset Challenge and Advance turn.
 				    	console.log ('Game' + user.game.gameID + ': Challenge Failed!');
+						// Assign Pile to Challenger
+						assignPileToPlayer(user.game.challenger);
+						// Reset Challenge and Advance turn.
 						user.game.challengeMax = 0;
 						selectNextPlayer(user.game);
 					} else {
@@ -365,6 +388,16 @@ function processCardCommand(user,request) {
 			}
 		} else {
 			console.log('Command: ' + user.username + ' slapped the pile');
+			if(checkSlapAcceptable(user.game)) {
+				// User is allowed to slap at this time - Assign this player the pile
+				assignPileToPlayer(user);
+				// Announce slap success
+				announceSlap(user,1);
+			} else {
+				// User is not allowed to slap at this time
+				// Announce slap failure
+				announceSlap(user,0);
+			}
 		}
 	}
 }
