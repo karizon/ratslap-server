@@ -9,9 +9,11 @@ var bcrypt = require('bcrypt');
 var rsVersion = '0.1';
 var serverPort = 31337;
 
+// set the first game and player IDs  each will increment as games start or players join
 var gameID = 1;
 var playerID = 1;
 
+// The standard, unshuffled deck.
 var standardDeck = [
 {type: 'CARD', suit: 'heart', face: 'A'},
 {type: 'CARD', suit: 'heart', face: '2'},
@@ -70,6 +72,8 @@ var standardDeck = [
 {type: 'CARD', suit: 'diamond', face: 'K'},
 ];
 
+
+// Functions for dealing with the date.
 // For todays date;
 Date.prototype.today = function(){ 
 	return this.getFullYear() +"/"+ (((this.getMonth()+1) < 10)?"0":"") 
@@ -83,6 +87,7 @@ Date.prototype.timeNow = function(){
 };
 var startDate = new Date();
 
+// What we return for HELO when clients first connect
 var heloString = {
 	type: 'HELO',
 	status: 'CONNECTED',
@@ -91,20 +96,24 @@ var heloString = {
 	started: startDate.today() + "T" + startDate.timeNow()
 };
 
+// Global arrays holding all current game state
 var clients = [];
 var games = [];
 var newTwoPlayer = [];
 var newFourPlayer = [];
 
+// SSL options
 var options = {
 	key: fs.readFileSync('server_key.pem'),
 	cert: fs.readFileSync('server_cert.pem')
 };
 
+// Add in a perl-ism ;)
 String.prototype.chomp = function () {
 	return this.replace(/(\n|\r)+$/, '');
 }
 
+// Standard error function
 function returnErrorCode(user,type,errorString) {
 	var errorJSON = {
 		type: type,
@@ -114,6 +123,7 @@ function returnErrorCode(user,type,errorString) {
 	user.remoteClient.write(JSON.stringify(errorJSON) + '\n');
 }
 
+// A simple function that returns some simple server statistics to all currently connected users
 function returnStatistics() {
     var results = {
         type:'STATISTICS',
@@ -131,8 +141,8 @@ function returnStatistics() {
 	}
 }
 
+// Pull out a complete JSON string from a stream of text
 function extractJSON(str) {
-	// str = str.toString;
     var firstOpen, firstClose, candidate;
     firstOpen = str.indexOf('{', firstOpen + 1);
     do {
@@ -147,6 +157,7 @@ function extractJSON(str) {
                 return [res, firstOpen, firstClose + 1];
             }
             catch(e) {
+            	// Ignore errors
             }
             firstClose = str.substr(0, firstClose).lastIndexOf('}');
         } while(firstClose > firstOpen);
@@ -154,6 +165,7 @@ function extractJSON(str) {
     } while(firstOpen != -1);
 }
 
+// An efficicent funciton for shuffling a deck of cards
 function shuffle (array, random) {
   var i = array.length, j, swap;
   while (--i) {
@@ -165,10 +177,13 @@ function shuffle (array, random) {
   return array;
 }
 
+// Returns a random integer between two values
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+// Deals cards in order to all the remaining players in the game
+// Used for initial deal as well as when a player leaves a game
 function dealCardsToRemainingPlayers(game, cards) {
 	var currentPlayer = 0;
 	cards.forEach(function(card) {
@@ -180,6 +195,7 @@ function dealCardsToRemainingPlayers(game, cards) {
 	});
 }
 
+// Announces the current round to all players in a game
 function announceCurrentRound(game) {
 	var handSizes = [];
 	var position = 1;
@@ -202,6 +218,7 @@ function announceCurrentRound(game) {
 
 }
 
+// Starts a game
 function startGame(game) {
 	// Shuffle the Deck.
 	var newDeck = standardDeck.slice(0);
@@ -214,6 +231,7 @@ function startGame(game) {
 	announceCurrentRound(game);
 }
 
+// Adds a player to a game.
 function addPlayer(user,game,gameSize) {
 	console.log('Game ' + gameID + ': Adding Player to game: ' + user.username);
 	if(!game) {
@@ -457,8 +475,8 @@ function gameStatusUpdate(game,status) {
     });
 }
 
+// The meat of the server.  Executes whenever a new client connects
 var server = tls.createServer(options,function(client) {
-	var playerCards = [];
 	var user = {
 		remoteAddress: client.socket.remoteAddress,
 		remotePort: client.socket.remotePort,
@@ -467,10 +485,10 @@ var server = tls.createServer(options,function(client) {
 		nickname: 'Unnamed Player',
 		game: null,
 		playerID: playerID,
-		cards: playerCards
+		cards: []
 	}
 
-	playerID = playerID + 1;
+	playerID += 1;
 
 	console.log('Network: Adding new client: ' + user.username);
 	clients.push(user);
