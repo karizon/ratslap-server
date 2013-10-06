@@ -1,3 +1,4 @@
+
 // Ratslap Server
 // Copyright 2013 Geoff 'Mandrake' Harrison <mandrake@mandrake.net>
 // http://mandrake.net
@@ -167,19 +168,19 @@ function extractJSON(str) {
 
 // An efficicent funciton for shuffling a deck of cards
 function shuffle (array, random) {
-  var i = array.length, j, swap;
-  while (--i) {
-    j = Math.random() * (i + 1) | 0;
-    swap = array[i];
-    array[i] = array[j];
-    array[j] = swap;
-  }
-  return array;
+	var i = array.length, j, swap;
+	while (--i) {
+		j = Math.random() * (i + 1) | 0;
+		swap = array[i];
+		array[i] = array[j];
+		array[j] = swap;
+	}
+	return array;
 }
 
 // Returns a random integer between two values
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 // Deals cards in order to all the remaining players in the game
@@ -215,7 +216,6 @@ function announceCurrentRound(game) {
     game.players.forEach(function(user) {
     	user.remoteClient.write(JSON.stringify(results) + '\n');
     });
-
 }
 
 // Starts a game
@@ -235,12 +235,11 @@ function startGame(game) {
 function addPlayer(user,game,gameSize) {
 	console.log('Game ' + gameID + ': Adding Player to game: ' + user.username);
 	if(!game) {
+		// 'If we didn't get a game passed in, it means that there's no waiting game on stack
 		console.log('Game ' + gameID + ': initialized');
-		var players = [];
 		var gameStart = new Date();
-		var centerPile = [];
 		var newGame = {
-			players: players,
+			players: [],
 			gameSize: gameSize,
 			started: gameStart.today() + "T" + gameStart.timeNow(),
 			whoseMove: 0,
@@ -249,8 +248,9 @@ function addPlayer(user,game,gameSize) {
 			challengeLeft: 0,
 			challengeMax: 0,
 			challenger: -1,
-			centerPile: centerPile
+			centerPile: []
 		}
+		// We have a different stack for new 2 + 4 player games
 		if(gameSize == 2) {
 			newTwoPlayer.push(newGame);
 		} else if(gameSize == 4) {
@@ -258,9 +258,11 @@ function addPlayer(user,game,gameSize) {
 		}
 		game = newGame;
 	}
+	// Add user to game
 	game.players.push(user);
 	user.game = game;
 	if(game.players.length == gameSize) {
+		// Game is full, put it in the main list and trigger a start
 		games.push(game);
 		game.gameID = gameID;
 		console.log('Game ' + gameID + ': Full, starting');
@@ -286,6 +288,7 @@ function processJoinCommand(user,request) {
 		console.log('Command: ' + user.username + ' joining 4 player game');
 		addPlayer(user,newFourPlayer[0],4)
 	} else {
+		// This should never happen - likely a bot
 		console.log('Command: ' + user.username + ' submitted bad join request');
 	}
 }
