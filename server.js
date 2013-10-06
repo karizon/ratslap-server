@@ -420,10 +420,6 @@ function processCardCommand(user,request) {
 	}
 }
 
-function processBootCommand(user,request) {
-	console.log('Command: ' + user.username + ' voted to boot a user');
-}
-
 function assignNickname(user,request) {
 	console.log('Command: ' + user.username + ' assigning new nickname: ' + request.nickname);
 	user.username = request.nickname + ' (' + user.username + ')';
@@ -496,23 +492,20 @@ var server = tls.createServer(options,function(client) {
 	returnStatistics();
 	client.on('data', function(data) {
 		var str = data.toString();
-		// console.log('Network: ' + user.remoteAddress + ' sent: ' +  data.toString());
 		var result = '';
 		while((result = extractJSON(str))) {
-			// console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(result[0]));
 			var newJSON = result[0];
-
+			// console.log('Command: User ' + user.username + ' submits: ' + JSON.stringify(newJSON));
 			if(newJSON.type == 'JOIN') {
 				processJoinCommand(user,newJSON);
 			} else if(newJSON.type == 'LEAVE') {
 				processLeaveCommand(user,newJSON);
 			} else if(newJSON.type == 'CARD') {
 				processCardCommand(user,newJSON);
-			} else if(newJSON.type == 'BOOT') {
-				processBootCommand(user,newJSON);
 			} else if(newJSON.type == 'NICKNAME') {
 				assignNickname(user,newJSON);
 			}
+			// Remove the JSON we've already parsed from the result set.
 			str = str.substr(0, result[1]) + str.substr(result[2]);
 		}
 	});
