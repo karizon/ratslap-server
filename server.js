@@ -340,7 +340,8 @@ function processCardCommand(user,request) {
 			    var newChallengeRemaining = checkChallengeStatus(user.game,newCard);
 			    if(newChallengeRemaining) {
 			    	// We have a challenge!  Set the counter and push to the next player!
-			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' + newChallengeRemaining + ' tries!');
+			    	console.log ('Game' + user.game.gameID + ': New Challenge - ' + 
+			    		newChallengeRemaining + ' tries!');
 			    	user.game.challengeLeft = newChallengeRemaining;
 			    	user.game.challengeMax = newChallengeRemaining;
 			    	selectNextPlayer(user.game);
