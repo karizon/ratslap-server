@@ -1,4 +1,3 @@
-
 // Ratslap Server
 // Copyright 2013 Geoff 'Mandrake' Harrison <mandrake@mandrake.net>
 // http://mandrake.net
@@ -6,7 +5,7 @@
 
 var tls = require('tls');
 var fs = require('fs');
-var bcrypt = require('bcrypt');
+// var bcrypt = require('bcrypt');
 var rsVersion = '0.1';
 var serverPort = 31337;
 
