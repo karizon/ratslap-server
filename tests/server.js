@@ -6,14 +6,13 @@
 tls = require('tls');
 var serverPort = 31337;
 
-
+console.log('TEST: Basic Server Connectivity');
 // callback for when secure connection established
 function connected(stream) {
 	if (stream) {
-        // socket connected
-    	//stream.write("GET / HTTP/1.0\n\rHost: encrypted.google.com:443\n\r\n\r");  
     } else {
-    	console.log("Connection failed");
+    	console.log("FAIL: Connection failed");
+    	process.exit(-1);
     }
 }
 
@@ -35,17 +34,26 @@ dummy.socket = tls.connect(serverPort, 'localhost', options, function() {
 
 dummy.socket.addListener('data', function(data) {
 	// received data
-	console.log(data);
+	// console.log(data);
+	var obj = JSON.parse(data);
+	if((obj.type == 'STATISTICS') && (obj.status == 'SUCCESS')) {
+		console.log('PASS: Server successfully transmitted statistics');
+		process.exit(0);
+	}
 });
 
 dummy.socket.addListener('error', function(error) {
 	if (!dummy.connected) {
     	// socket was not connected, notify callback
-		connected(null);
+    	console.log('FAIL: Connection Failed');
+		process.exit(-1)
 	}
-	console.log('error internally: ' + error);
+	console.log('FAIL: ' + error);
+	process.exit(-1);
 });
 
 dummy.socket.addListener('close', function() {
+	console.log('FAIL: Server dropped connection')
+	process.exit(-1);
 	// do something
 });
