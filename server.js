@@ -3,6 +3,9 @@
 // http://mandrake.net
 // All Rights Reserved
 
+// Add New Relic Agent
+require('newrelic');
+
 var tls = require('tls');
 var fs = require('fs');
 // var bcrypt = require('bcrypt');

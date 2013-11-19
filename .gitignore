@@ -2,3 +2,4 @@
 .*fuse*
 config.js
 .*DS_Store
+*.log
